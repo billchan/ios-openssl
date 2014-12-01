@@ -8,12 +8,12 @@ set -x
 
 # Setup paths to stuff we need
 
-OPENSSL_VERSION="1.0.1g"
+OPENSSL_VERSION="1.0.1j"
 
 DEVELOPER="/Applications/Xcode.app/Contents/Developer"
 
-SDK_VERSION="7.1"
-MIN_VERSION="4.3"
+SDK_VERSION="8.1"
+MIN_VERSION="7.0"
 
 IPHONEOS_PLATFORM="${DEVELOPER}/Platforms/iPhoneOS.platform"
 IPHONEOS_SDK="${IPHONEOS_PLATFORM}/Developer/SDKs/iPhoneOS${SDK_VERSION}.sdk"
@@ -76,8 +76,8 @@ build()
    perl -i -pe 's|static volatile sig_atomic_t intr_signal|static volatile int intr_signal|' crypto/ui/ui_openssl.c
    perl -i -pe "s|^CC= gcc|CC= ${GCC} -arch ${ARCH} -miphoneos-version-min=${MIN_VERSION}|g" Makefile
    perl -i -pe "s|^CFLAG= (.*)|CFLAG= -isysroot ${SDK} \$1|g" Makefile
-   make &> "/tmp/openssl-${OPENSSL_VERSION}-${ARCH}.build-log"
-   make install &> "/tmp/openssl-${OPENSSL_VERSION}-${ARCH}.install-log"
+   make &> "/tmp/openssl-${OPENSSL_VERSION}-${ARCH}.build.log"
+   make install &> "/tmp/openssl-${OPENSSL_VERSION}-${ARCH}.install.log"
    popd
    rm -rf "openssl-${OPENSSL_VERSION}"
 }
@@ -110,5 +110,5 @@ lipo \
 	-create -output lib/libssl.a
 
 rm -rf "/tmp/openssl-${OPENSSL_VERSION}-*"
-rm -rf "/tmp/openssl-${OPENSSL_VERSION}-*.*-log"
+rm -rf "/tmp/openssl-${OPENSSL_VERSION}-*.*.log"
 
