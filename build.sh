@@ -13,7 +13,8 @@ OPENSSL_VERSION="1.0.1m"
 DEVELOPER="/Applications/Xcode.app/Contents/Developer"
 
 SDK_VERSION="9.0"
-MIN_VERSION="6.0"
+WATCH_SDK_VERSION="2.0"
+MIN_VERSION="2.0"
 
 IPHONEOS_PLATFORM="${DEVELOPER}/Platforms/iPhoneOS.platform"
 IPHONEOS_SDK="${IPHONEOS_PLATFORM}/Developer/SDKs/iPhoneOS${SDK_VERSION}.sdk"
@@ -22,6 +23,11 @@ IPHONEOS_GCC="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault
 IPHONESIMULATOR_PLATFORM="${DEVELOPER}/Platforms/iPhoneSimulator.platform"
 IPHONESIMULATOR_SDK="${IPHONESIMULATOR_PLATFORM}/Developer/SDKs/iPhoneSimulator${SDK_VERSION}.sdk"
 IPHONESIMULATOR_GCC="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang"
+
+
+WATCHSIMULATOR_PLATFORM="${DEVELOPER}/Platforms/WatchSimulator.platform"
+WATCHSIMULATOR_SDK="${WATCHSIMULATOR_PLATFORM}/Developer/SDKs/WatchSimulator${WATCH_SDK_VERSION}.sdk"
+WATCHSIMULATOR_GCC="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang"
 
 # Make sure things actually exist
 
@@ -75,7 +81,7 @@ build()
    cd "openssl-${OPENSSL_VERSION}"
    ./Configure ${TARGET} --openssldir="/tmp/openssl-${OPENSSL_VERSION}-${ARCH}" ${EXTRA} &> "/tmp/openssl-${OPENSSL_VERSION}-${ARCH}.log"
    perl -i -pe 's|static volatile sig_atomic_t intr_signal|static volatile int intr_signal|' crypto/ui/ui_openssl.c
-   perl -i -pe "s|^CC= gcc|CC= ${GCC} -arch ${ARCH} -miphoneos-version-min=${MIN_VERSION}|g" Makefile
+   perl -i -pe "s|^CC= gcc|CC= ${GCC} -arch ${ARCH} -mwatchos-version-min=${MIN_VERSION}|g" Makefile
    perl -i -pe "s|^CFLAG= (.*)|CFLAG= -isysroot ${SDK} \$1|g" Makefile
    make &> "/tmp/openssl-${OPENSSL_VERSION}-${ARCH}.build-log"
    if [ "$INSTALL" == "yes" ]; then
@@ -91,10 +97,11 @@ build()
 
 #### WE REMOVE armv7s architecture
 
-build "BSD-generic32" "armv7" "${IPHONEOS_GCC}" "${IPHONEOS_SDK}" "" "no"
-build "BSD-generic64" "arm64" "${IPHONEOS_GCC}" "${IPHONEOS_SDK}" "" "no"
-build "BSD-generic32" "i386" "${IPHONESIMULATOR_GCC}" "${IPHONESIMULATOR_SDK}" "" "yes"
-build "BSD-generic64" "x86_64" "${IPHONESIMULATOR_GCC}" "${IPHONESIMULATOR_SDK}" "-DOPENSSL_NO_ASM" "no"
+# build "BSD-generic32" "armv7" "${IPHONEOS_GCC}" "${IPHONEOS_SDK}" "" "no"
+# build "BSD-generic64" "arm64" "${IPHONEOS_GCC}" "${IPHONEOS_SDK}" "" "no"
+# build "BSD-generic32" "i386" "${IPHONESIMULATOR_GCC}" "${IPHONESIMULATOR_SDK}" "" "yes"
+# build "BSD-generic64" "x86_64" "${IPHONESIMULATOR_GCC}" "${IPHONESIMULATOR_SDK}" "-DOPENSSL_NO_ASM" "no"
+build "BSD-generic32" "i386" "${WATCHSIMULATOR_GCC}" "${WATCHSIMULATOR_SDK}" "" "no"
 
 #
 
@@ -103,16 +110,10 @@ cp -r /tmp/openssl-${OPENSSL_VERSION}-i386/include/openssl include/
 
 mkdir lib
 lipo \
-	"/tmp/openssl-${OPENSSL_VERSION}-armv7/lib/libcrypto.a" \
-	"/tmp/openssl-${OPENSSL_VERSION}-arm64/lib/libcrypto.a" \
 	"/tmp/openssl-${OPENSSL_VERSION}-i386/lib/libcrypto.a" \
-	"/tmp/openssl-${OPENSSL_VERSION}-x86_64/lib/libcrypto.a" \
 	-create -output lib/libcrypto.a
 lipo \
-	"/tmp/openssl-${OPENSSL_VERSION}-armv7/lib/libssl.a" \
-	"/tmp/openssl-${OPENSSL_VERSION}-arm64/lib/libssl.a" \
 	"/tmp/openssl-${OPENSSL_VERSION}-i386/lib/libssl.a" \
-	"/tmp/openssl-${OPENSSL_VERSION}-x86_64/lib/libssl.a" \
 	-create -output lib/libssl.a
 
 rm -rf "/tmp/openssl-${OPENSSL_VERSION}-*"
