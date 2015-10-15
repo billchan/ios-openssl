@@ -107,7 +107,7 @@ build()
 # build "BSD-generic64" "arm64" "${IPHONEOS_GCC}" "${IPHONEOS_SDK}" "" "no"
 # build "BSD-generic32" "i386" "${IPHONESIMULATOR_GCC}" "${IPHONESIMULATOR_SDK}" "" "yes"
 # build "BSD-generic64" "x86_64" "${IPHONESIMULATOR_GCC}" "${IPHONESIMULATOR_SDK}" "-DOPENSSL_NO_ASM" "no"
-build "BSD-generic32" "armv7k" "${WATCHOS_GCC}"        "${WATCHOS_SDK}"        "" "no" "${WATCHOS_NAME}"
+build "BSD-generic32" "armv7k" "${WATCHOS_GCC}"        "${WATCHOS_SDK}"        "-fembed-bitcode" "no" "${WATCHOS_NAME}"
 build "BSD-generic32" "i386"   "${WATCHSIMULATOR_GCC}" "${WATCHSIMULATOR_SDK}" "" "no" "${WATCHSIMULATOR_NAME}"
 
 #
