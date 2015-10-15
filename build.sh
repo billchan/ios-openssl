@@ -29,6 +29,11 @@ WATCHSIMULATOR_PLATFORM="${DEVELOPER}/Platforms/${WATCHSIMULATOR_NAME}.platform"
 WATCHSIMULATOR_SDK="${WATCHSIMULATOR_PLATFORM}/Developer/SDKs/${WATCHSIMULATOR_NAME}${WATCH_SDK_VERSION}.sdk"
 WATCHSIMULATOR_GCC="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang"
 
+WATCHOS_NAME="WatchOS"
+WATCHOS_PLATFORM="${DEVELOPER}/Platforms/${WATCHOS_NAME}.platform"
+WATCHOS_SDK="${WATCHOS_PLATFORM}/Developer/SDKs/${WATCHOS_NAME}${WATCH_SDK_VERSION}.sdk"
+WATCHOS_GCC="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang"
+
 # Make sure things actually exist
 
 if [ ! -d "$IPHONEOS_PLATFORM" ]; then
@@ -102,7 +107,8 @@ build()
 # build "BSD-generic64" "arm64" "${IPHONEOS_GCC}" "${IPHONEOS_SDK}" "" "no"
 # build "BSD-generic32" "i386" "${IPHONESIMULATOR_GCC}" "${IPHONESIMULATOR_SDK}" "" "yes"
 # build "BSD-generic64" "x86_64" "${IPHONESIMULATOR_GCC}" "${IPHONESIMULATOR_SDK}" "-DOPENSSL_NO_ASM" "no"
-build "BSD-generic32" "i386" "${WATCHSIMULATOR_GCC}" "${WATCHSIMULATOR_SDK}" "" "no" "${WATCHSIMULATOR_NAME}"
+build "BSD-generic32" "armv7k" "${WATCHOS_GCC}"        "${WATCHOS_SDK}"        "" "no" "${WATCHOS_NAME}"
+build "BSD-generic32" "i386"   "${WATCHSIMULATOR_GCC}" "${WATCHSIMULATOR_SDK}" "" "no" "${WATCHSIMULATOR_NAME}"
 
 #
 
@@ -111,10 +117,12 @@ cp -r /tmp/openssl-${OPENSSL_VERSION}-i386/include/openssl include/
 
 mkdir lib
 lipo \
-	"/tmp/openssl-${OPENSSL_VERSION}-WatchSimulator-i386/lib/libcrypto.a" \
+  "/tmp/openssl-${OPENSSL_VERSION}-WatchOS-armv7k/lib/libcrypto.a" \
+  "/tmp/openssl-${OPENSSL_VERSION}-WatchSimulator-i386/lib/libcrypto.a" \
 	-create -output lib/libcrypto.a
 lipo \
-	"/tmp/openssl-${OPENSSL_VERSION}-WatchSimulator-i386/lib/libssl.a" \
+  "/tmp/openssl-${OPENSSL_VERSION}-WatchOS-armv7k/lib/libssl.a" \
+  "/tmp/openssl-${OPENSSL_VERSION}-WatchSimulator-i386/lib/libssl.a" \
 	-create -output lib/libssl.a
 
 rm -rf "/tmp/openssl-${OPENSSL_VERSION}-*"
