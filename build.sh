@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Yay shell scripting! This script builds a static version of
-# OpenSSL ${OPENSSL_VERSION} for iOS 7.0 that contains code for
-# armv6, armv7, arm7s and i386.
+# OpenSSL ${OPENSSL_VERSION} for iOS 9.0 that contains code for
+# armv7, arm7s, armv7k, arm64 and i386.
 
 set -x
 
